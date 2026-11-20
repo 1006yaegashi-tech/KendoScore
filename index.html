@@ -6,10 +6,10 @@
 <title>剣道スコア（個人戦・団体戦）</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#e8ecf2;--yel:#fff3bf;--yelb:#e0b800;--surf:#fff;--ink:#14213a;--mute:#5d6a82;--line:#c9d1de;--red:#c4372f;--redbg:#fbeceb;--wht:#14213a;--whtbg:#eef1f6;--btn:#14213a;--btnt:#fff;
+:root{--bg:#e8ecf2;--yel:#fff3bf;--yelb:#e0b800;--sky:#d9f0ff;--skyb:#2f9be0;--surf:#fff;--ink:#14213a;--mute:#5d6a82;--line:#c9d1de;--red:#c4372f;--redbg:#fbeceb;--wht:#14213a;--whtbg:#eef1f6;--btn:#14213a;--btnt:#fff;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--yel:#4d4318;--yelb:#a88f1a;--surf:#16223a;--ink:#eef1f7;--mute:#9aa7c0;--line:#2a3a5a;--red:#ef6a60;--redbg:#3a1f26;--wht:#eef1f7;--whtbg:#1d2c4a;--btn:#eef1f7;--btnt:#14213a;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0e1626;--yel:#4d4318;--yelb:#a88f1a;--surf:#16223a;--ink:#eef1f7;--mute:#9aa7c0;--line:#2a3a5a;--red:#ef6a60;--redbg:#3a1f26;--wht:#eef1f7;--whtbg:#1d2c4a;--btn:#eef1f7;--btnt:#14213a;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--yel:#4d4318;--yelb:#a88f1a;--sky:#143a56;--skyb:#4aa3df;--surf:#16223a;--ink:#eef1f7;--mute:#9aa7c0;--line:#2a3a5a;--red:#ef6a60;--redbg:#3a1f26;--wht:#eef1f7;--whtbg:#1d2c4a;--btn:#eef1f7;--btnt:#14213a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1626;--yel:#4d4318;--yelb:#a88f1a;--sky:#143a56;--skyb:#4aa3df;--surf:#16223a;--ink:#eef1f7;--mute:#9aa7c0;--line:#2a3a5a;--red:#ef6a60;--redbg:#3a1f26;--wht:#eef1f7;--whtbg:#1d2c4a;--btn:#eef1f7;--btnt:#14213a;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.5}
@@ -61,6 +61,7 @@ textarea{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border
 #ievn{margin-bottom:8px}#imsg{font-size:.9rem;margin-top:8px;min-height:1.4em}
 .tm{background:var(--yel);border:2px solid var(--yelb);border-radius:10px;padding:10px 14px;margin:8px 0}.tm summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center;gap:8px}
 .ub{margin-left:auto;background:#14213a;color:#ffd84d;border:1px solid #ffd84d;border-radius:10px;padding:1px 10px;font-size:.8rem;font-weight:700;text-align:right}
+#evn{background:var(--sky);border:2px solid var(--skyb);font-weight:700}
 #msg{font-size:.9rem;margin-top:8px;min-height:1.4em}
 .rg{display:grid;grid-template-columns:3.6em 1fr;gap:6px;align-items:center;margin-bottom:6px}
 .rg span{font-weight:700;font-size:.9rem}.rh span{color:var(--mute)}
@@ -76,15 +77,16 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 <main>
 <h1>剣道スコア入力</h1>
 <nav class="tabs"><button id="tabm" class="on">試合入力</button><button id="tabe">出場者</button><button id="tabt">名簿</button></nav>
+<input id="evn" placeholder="大会名・未入力は個人・団体戦となります" aria-label="大会名" style="margin-bottom:8px">
 <select id="mode" aria-label="形式" style="margin-bottom:8px;width:100%"><option value="i">個人戦</option><option value="5">団体戦 5人制（先鋒・次鋒・中堅・副将・大将）</option><option value="3">団体戦 3人制（先鋒・中堅・大将）</option></select>
-<div id="infobar" class="sub" style="margin-bottom:8px">名前以外の情報表示：<select id="inf1" aria-label="表示する情報1"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select> <select id="inf2" aria-label="表示する情報2"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select> <button class="sm" id="resetview" style="margin:0 0 0 6px">表示リセット</button></div>
+<div id="infobar" class="sub" style="margin-bottom:8px;display:flex;flex-wrap:wrap;align-items:center;gap:6px">名前以外の情報表示：<select id="inf1" aria-label="表示する情報1"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select> <select id="inf2" aria-label="表示する情報2"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select> <button class="sm" id="resetview" style="margin:0 0 0 6px">チームリセット</button><button class="sm" id="resetall" style="margin:0 0 0 auto">すべてリセット</button></div>
+<div id="allpanel" class="hist" hidden style="margin:8px 0"><div>大会名も含めて、入力をすべてリセットします。</div><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="alldel" style="width:auto;min-height:0"><span>記録した試合も消す</span></label><div class="row" style="margin-top:0"><button class="pri" id="allgo">リセットする</button><button id="allno">やめる</button></div></div>
 <div id="sidebar" class="hist" style="margin:8px 0"><h2>対戦チーム</h2>
 <div style="display:grid;grid-template-columns:1fr auto;gap:6px"><select id="myteam" aria-label="自分のチーム"></select><select id="mycolor" aria-label="自分のチームの色"><option value="r">自分は赤</option><option value="w">自分は白</option></select></div>
 <select id="oppteam" aria-label="相手チーム" style="width:100%;margin-top:6px"></select>
 <div class="sub" id="sidemsg" style="margin-top:6px"></div></div>
 <div id="viewm">
 
-<input id="evn" placeholder="大会名・日付など（PDFの見出し）" aria-label="大会名">
 <div class="hist" style="margin:8px 0"><h2>チーム・選手名の入力</h2>
 <div class="teams">
 <section class="side r"><div class="tag">赤</div><select id="tselr" hidden aria-label="登録チームから選ぶ" style="width:100%;margin-bottom:6px"></select><button class="sm" id="autor" style="margin:0 0 6px" hidden>登録順に入れる</button><input id="tr" placeholder="所属（剣道会・学校など）" aria-label="赤の所属"><div id="rostr" style="margin-top:8px"></div><div id="swpr" style="margin-top:10px"></div></section>
@@ -123,7 +125,7 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 <div class="cur-title" id="imno"></div>
 
 
-<input id="ievn" placeholder="大会名・日付など（PDFの見出し）" aria-label="大会名">
+
 <div class="timer"><label>試合時間　<select id="idur" aria-label="試合時間"><option value="120">2分</option><option value="180" selected>3分</option><option value="240">4分</option><option value="300">5分</option></select></label>　<label>開始時刻　<select id="ish" aria-label="開始の時"></select>時 <select id="ism" aria-label="開始の分"></select>分</label></div>
 <div class="status" id="istatus" aria-live="polite"></div>
 
@@ -199,13 +201,15 @@ const jkTxt=b=>b.jk&&b.sr===b.sw?'　じゃんけん '+(b.jk==='r'?'赤○ 白�
 const nI=s=>{const t=infoStr(dataOf(TID[s],nm(s)));return t?`<br><small class="sub">${esc(t)}</small>`:''};
 const pAttr=p=>[p.age?p.age+'歳':'',p.sex,p.grade,p.rank].filter(Boolean).join(' ');
 function load(){
-  bouts=[];RR=[];RW=[];NMAP={};TID={r:'',w:''};['tr','tw','evn'].forEach(i=>$(i).value='');
-  try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');bouts=s.bouts||[];RR=s.rr||[];RW=s.rw||[];$('tr').value=s.tr||'';$('tw').value=s.tw||'';$('evn').value=s.evn||''}catch(e){}
+  bouts=[];RR=[];RW=[];NMAP={};TID={r:'',w:''};['tr','tw'].forEach(i=>$(i).value='');
+  try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');bouts=s.bouts||[];RR=s.rr||[];RW=s.rw||[];$('tr').value=s.tr||'';$('tw').value=s.tw||''}catch(e){}
   const oc=SIDE.color==='r'?'w':'r';TID={r:'',w:''};TID[SIDE.color]=SIDE.my;TID[oc]=SIDE.opp;
 }
 load();$('mode').value=MODE;
+try{$('evn').value=localStorage.getItem('kendoEvn')||''}catch(e){}
 const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify({bouts,rr:RR,rw:RW,tid:TID,tr:$('tr').value,tw:$('tw').value,evn:$('evn').value}))}catch(e){}};
-['tr','tw','evn'].forEach(i=>$(i).addEventListener('input',persist));
+['tr','tw'].forEach(i=>$(i).addEventListener('input',persist));
+$('evn').addEventListener('input',()=>{try{localStorage.setItem('kendoEvn',$('evn').value)}catch(e){}});
 const tn=s=>$('t'+s).value.trim()||(s==='r'?'赤チーム':'白チーム');
 const nm=s=>((s==='r'?RR:RW)[ci()]||'').trim()||(s==='r'?'赤':'白');
 
@@ -326,7 +330,7 @@ function buildRoster(){
   refreshPickers();buildRows();
 }
 let TAB='m';
-function showView(){const m=$('mode').value;$('viewt').hidden=TAB!=='t';$('viewe').hidden=TAB!=='e';$('viewm').hidden=TAB!=='m'||m==='i';$('viewi').hidden=TAB!=='m'||m!=='i';$('infobar').hidden=TAB!=='m';$('mode').hidden=TAB!=='m';$('sidebar').hidden=TAB!=='m';['m','e','t'].forEach(k=>$('tab'+k).classList.toggle('on',TAB===k))}
+function showView(){const m=$('mode').value;$('viewt').hidden=TAB!=='t';$('viewe').hidden=TAB!=='e';$('viewm').hidden=TAB!=='m'||m==='i';$('viewi').hidden=TAB!=='m'||m!=='i';$('infobar').hidden=TAB!=='m';$('mode').hidden=TAB!=='m';$('evn').hidden=TAB!=='m';if(TAB!=='m')$('allpanel').hidden=true;$('sidebar').hidden=TAB!=='m';['m','e','t'].forEach(k=>$('tab'+k).classList.toggle('on',TAB===k))}
 function initRoster(){
   ['r','w'].forEach(s=>{
     $('rost'+s).addEventListener('input',e=>{const t=e.target;if(t.tagName==='INPUT'){RA(s)[+t.dataset.i]=t.value.trim();persist();render()}});
@@ -338,22 +342,30 @@ function initRoster(){
       persist();render();
     });
     $('tsel'+s).onchange=()=>{TID[s]=$('tsel'+s).value;const T=teamOf(s);if(T)$('t'+s).value=T.name;persist();refreshPickers();buildRows();render()};
-    $('auto'+s).onclick=()=>{const T=teamOf(s);if(!T)return;const R=RA(s);POS.forEach((_,i)=>{R[i]=pl(T)[i]||''});persist();buildRows();render()};
+    $('auto'+s).onclick=()=>{const T=teamOf(s);if(!T)return;const nr=POS.map((_,i)=>pl(T)[i]||'').concat(RA(s).slice(POS.length));if(s==='r')RR=nr;else RW=nr;persist();buildRows();render()};
   });
   document.querySelectorAll('.jk').forEach(el=>el.addEventListener('change',()=>{const s=el.dataset.jk;JK=el.value==='o'?s:el.value==='x'?(s==='r'?'w':'r'):'';render()}));
   let armedR=false;
-  $('resetview').onclick=()=>{
-    const bt=$('resetview');
-    if(!armedR){armedR=true;bt.textContent='もう一度押すとリセット';setTimeout(()=>{armedR=false;bt.textContent='表示リセット'},4000);return}
-    armedR=false;bt.textContent='表示リセット';
+  function doReset(all,del){
     ev=[];cur=null;JK='';RR=[];RW=[];NMAP={};
-    ['tr','tw','evn'].forEach(i=>{$(i).value=''});
+    ['tr','tw'].forEach(i=>{$(i).value=''});
     SIDE={my:'',color:'r',opp:''};
     INFO={a:'',b:''};saveInfo();$('inf1').value='';$('inf2').value='';
     $('sh').value='00';$('sm').value='00';$('dur').value='180';
-    if(window.resetInd)window.resetInd();
+    const isInd=$('mode').value==='i';
+    if(all){$('evn').value='';try{localStorage.setItem('kendoEvn','')}catch(e){}}
+    if(del&&!isInd)bouts=[];
+    if(window.resetInd)window.resetInd(del&&isInd);
     buildRoster();refreshSide();applySide();
+  }
+  $('resetview').onclick=()=>{
+    const bt=$('resetview');
+    if(!armedR){armedR=true;bt.textContent='もう一度押すとリセット';setTimeout(()=>{armedR=false;bt.textContent='チームリセット'},4000);return}
+    armedR=false;bt.textContent='チームリセット';doReset(false,false);
   };
+  $('resetall').onclick=()=>{$('allpanel').hidden=!$('allpanel').hidden};
+  $('allno').onclick=()=>{$('allpanel').hidden=true};
+  $('allgo').onclick=()=>{doReset(true,$('alldel').checked);$('alldel').checked=false;$('allpanel').hidden=true};
   $('mode').onchange=()=>{
     persist();const m=$('mode').value;
     try{localStorage.setItem('kendoMode',m)}catch(e){}
@@ -456,9 +468,10 @@ function refreshSide(){
 }
 function applySide(){
   const oc=SIDE.color==='r'?'w':'r';
-  NMAP[tk(TID.r,'r')]=RR;NMAP[tk(TID.w,'w')]=RW;
+  const kk=()=>TID.r&&TID.r===TID.w?[TID.r+'|r',TID.w+'|w']:[tk(TID.r,'r'),tk(TID.w,'w')];
+  let k=kk();NMAP[k[0]]=RR;NMAP[k[1]]=RW;
   TID={r:'',w:''};TID[SIDE.color]=SIDE.my;TID[oc]=SIDE.opp;
-  RR=NMAP[tk(TID.r,'r')]||[];RW=NMAP[tk(TID.w,'w')]||[];
+  k=kk();RR=NMAP[k[0]]||[];RW=NMAP[k[1]]||[];if(RR===RW)RW=RW.slice();
   ['r','w'].forEach(s=>{const T=teamOf(s);if(T)$('t'+s).value=T.name});
   saveSide();persist();refreshPickers();buildRows();render();
   if(window.refreshInd)window.refreshInd();
@@ -491,7 +504,7 @@ async function mkPdf(){
   const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   const t=tally(),v=verdict();
   x.fillStyle='#fff';x.fillRect(0,0,W,H);
-  x.fillStyle='#14213a';x.font='bold 52px '+F;x.textAlign='center';x.fillText($('evn').value.trim()||'剣道 団体戦記録',W/2,120,W-160);
+  x.fillStyle='#14213a';x.font='bold 52px '+F;x.textAlign='center';x.fillText($('evn').value.trim()||'団体戦',W/2,120,W-160);
   x.fillStyle='#14213a';x.font='28px '+F;x.textAlign='center';x.fillText(new Date().toLocaleDateString('ja-JP')+'　'+POS.length+'人制　'+$('dur').selectedOptions[0].text+'試合　'+$('sh').value+':'+$('sm').value+'開始',W/2,205,W-160);x.textAlign='left';
   x.font='bold 40px '+F;x.textAlign='center';x.fillStyle='#c4372f';x.fillText(tn('r'),350,300,420);
   x.fillStyle='#14213a';x.fillText(tn('w'),940,300,420);
@@ -679,7 +692,7 @@ async function mkPdf(){
     x.restore();
   };
   const hs=(px,n)=>px+(n?n*64+58:24);
-    x.fillStyle='#14213a';x.font='bold 52px '+F;x.textAlign='center';x.fillText($('ievn').value.trim()||'剣道 試合記録',W/2,120,W-160);
+    x.fillStyle='#14213a';x.font='bold 52px '+F;x.textAlign='center';x.fillText(document.getElementById('evn').value.trim()||'個人戦',W/2,120,W-160);
     x.fillStyle='#14213a';x.font='28px '+F;x.textAlign='center';x.fillText(new Date().toLocaleDateString('ja-JP')+'　'+$('idur').selectedOptions[0].text+'試合　'+$('ish').value+':'+$('ism').value+'開始',W/2,205,W-160);x.textAlign='left';
     matches.slice(p*per,p*per+per).forEach((m,i)=>{
       const y=275+i*300;
@@ -741,7 +754,7 @@ function refreshInd(){['r','w'].forEach(s=>{
   $('itsel'+s).onchange=()=>{const T=EVT.find(t=>t.id===$('itsel'+s).value);if(T)$('ia'+s).value=T.name;$('ipl'+s).innerHTML=plOpts(s);$('ipl'+s).hidden=!T;$('in'+s).value='';$('in'+s).hidden=!!T;render()};
   $('ipl'+s).onchange=()=>{const v=$('ipl'+s).value;if(v==='__o'){$('in'+s).hidden=false;$('in'+s).value='';$('in'+s).focus()}else{$('in'+s).value=v;$('in'+s).hidden=true}render()};
 });
-window.refreshInd=refreshInd;window.renderInd=()=>{render();renderHist()};window.resetInd=()=>{ev=[];edit=null;clearForm();$('ievn').value='';$('ish').value='00';$('ism').value='00';$('idur').value='180';render();renderHist()};refreshInd();
+window.refreshInd=refreshInd;window.renderInd=()=>{render();renderHist()};window.resetInd=(del)=>{ev=[];edit=null;clearForm();if(del){matches=[];no=1;persist()}$('ish').value='00';$('ism').value='00';$('idur').value='180';render();renderHist()};refreshInd();
 })();
 refreshSide();applySide();showView();
 </script>
