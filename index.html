@@ -61,9 +61,14 @@ textarea{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border
 .log{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:10px}.log h2{font-size:.95rem;margin:0 0 6px}.log ol{margin:0;padding-left:1.3em}
 #viewi .side input,#viewi .side select{margin-bottom:6px}#viewi .side input.af{font-weight:400;font-size:.9rem}.side select{width:100%}
 #ievn{margin-bottom:8px}#imsg{font-size:.9rem;margin-top:8px;min-height:1.4em}
-.tm{background:var(--yel);border:2px solid var(--yelb);border-radius:10px;padding:10px 14px;margin:8px 0}.tm summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center;gap:8px}
+.tm{background:var(--yel);border:2px solid var(--yelb);border-radius:10px;padding:10px 14px;margin:8px 0}.tm summary{font-weight:700;cursor:pointer;min-height:32px;display:flex;align-items:center;gap:10px}
 .ub{margin-left:auto;background:#14213a;color:#ffd84d;border:1px solid #ffd84d;border-radius:10px;padding:1px 10px;font-size:.8rem;font-weight:700;text-align:right}
 #evn{background:var(--sky);border:2px solid var(--skyb);font-weight:700}
+#ename{background:var(--sky);border:2px solid var(--skyb);font-weight:700}
+.tsum{flex:1;min-width:0}.tname{font-size:1.05rem;display:flex;flex-wrap:wrap;align-items:center;gap:4px 0}.tname .cp{margin:0 0 0 6px}.cp.ct{border-color:#1f9d55;background:#dff5e6;color:#14532d}
+.tm summary::-webkit-details-marker{display:none}.tm summary::after{content:'▾';margin-left:auto;font-size:1.2rem}.tm[open] summary::after{content:'▴'}
+.cp{display:inline-block;border:2px solid var(--ink);border-radius:8px;padding:1px 9px;margin:6px 6px 0 0;background:var(--surf);color:var(--ink);font-size:.85rem;font-weight:400}
+.cp b{font-size:1.15rem;font-weight:800}.cp.cm{border-color:#2f7fd0}.cp.cf{border-color:#d0488f}
 #msg{font-size:.9rem;margin-top:8px;min-height:1.4em}
 .rg{display:grid;grid-template-columns:3.6em 1fr;gap:6px;align-items:center;margin-bottom:6px}
 .rg span{font-weight:700;font-size:.9rem}.rh span{color:var(--mute)}
@@ -77,16 +82,16 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 </head>
 <body>
 <main>
-<h1>剣道スコア入力</h1>
+<h1 style="display:flex;align-items:center;justify-content:space-between;gap:8px">剣道スコア入力<button class="sm rf" id="resetall" style="margin:0;font-size:.85rem;font-weight:700">すべてリセット</button></h1>
+<div id="allpanel" class="hist" hidden style="margin:8px 0"><div>大会名も含めて、入力をすべてリセットします。</div><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="alldel" style="width:auto;min-height:0"><span>記録した試合も消す</span></label><div class="row" style="margin-top:0"><button class="pri" id="allgo">リセットする</button><button id="allno">やめる</button></div></div>
 <nav class="tabs"><button id="tabm" class="on">試合入力</button><button id="tabe">出場者</button><button id="tabt">名簿</button></nav>
 <input id="evn" placeholder="大会名・未入力は個人・団体戦となります" aria-label="大会名" style="margin-bottom:8px">
 <select id="mode" aria-label="形式" style="margin-bottom:8px;width:100%"><option value="i">個人戦</option><option value="5">団体戦 5人制（先鋒・次鋒・中堅・副将・大将）</option><option value="3">団体戦 3人制（先鋒・中堅・大将）</option></select>
-<div id="infobar" class="sub" style="margin-bottom:8px;display:flex;flex-wrap:wrap;align-items:center;gap:6px"><button class="sm yf" id="resetview" style="margin:0">チームリセット</button>名前以外の情報表示：<select id="inf1" aria-label="表示する情報1"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select> <select id="inf2" aria-label="表示する情報2"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select> <button class="sm rf" id="resetall" style="margin:0 0 0 auto">すべてリセット</button></div>
-<div id="allpanel" class="hist" hidden style="margin:8px 0"><div>大会名も含めて、入力をすべてリセットします。</div><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="alldel" style="width:auto;min-height:0"><span>記録した試合も消す</span></label><div class="row" style="margin-top:0"><button class="pri" id="allgo">リセットする</button><button id="allno">やめる</button></div></div>
-<div id="sidebar" class="hist" style="margin:8px 0"><h2>対戦チーム</h2>
+<div id="sidebar" class="hist" style="margin:8px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px"><h2 style="margin:0">対戦チーム</h2><button class="sm yf" id="resetview" style="margin:0">チームリセット</button></div>
 <div style="display:grid;grid-template-columns:1fr auto;gap:6px"><select id="myteam" aria-label="自分のチーム"></select><select id="mycolor" aria-label="自分のチームの色"><option value="r">自分は赤</option><option value="w">自分は白</option></select></div>
 <select id="oppteam" aria-label="相手チーム" style="width:100%;margin-top:6px"></select>
-<div class="sub" id="sidemsg" style="margin-top:6px"></div></div>
+<div class="sub" id="sidemsg" style="margin-top:6px"></div>
+<div id="infobar" class="sub" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--line)">名前以外の情報表示：<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"><select id="inf1" aria-label="表示する情報1" style="width:100%"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select><select id="inf2" aria-label="表示する情報2" style="width:100%"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select><select id="inf3" aria-label="表示する情報3" style="width:100%"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select><select id="inf4" aria-label="表示する情報4" style="width:100%"><option value="">なし</option><option value="age">年齢</option><option value="sex">男女</option><option value="grade">学年</option><option value="rank">級位・段位</option></select></div></div></div>
 <div id="viewm">
 
 <div class="hist" style="margin:8px 0"><h2>チーム・選手名の入力</h2>
@@ -149,15 +154,15 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 <div style="margin-top:12px"><button class="pri" id="ipdf" style="width:100%">PDFに保存</button><div id="imsg" aria-live="polite"></div></div></div>
 </div>
 <div id="viewe" hidden>
-<div class="hist" style="margin:8px 0"><h2>大会チームを作る</h2><div class="sub">名簿から所属と選手を選んで、この大会で使うチームを作ります。同じ所属から、Aチーム・Bチームのように複数作れます。作ったチームは「試合入力」で選びます。</div>
+<div class="hist" style="margin:8px 0"><h2>大会チーム編成</h2><div class="sub">名簿から所属と選手を選んで、この大会で使うチームを作ります。同じ所属から、Aチーム・Bチームのように複数作れます。作ったチームは「試合入力」で選びます。</div>
 <select id="emaster" style="width:100%;margin-top:8px" aria-label="所属を選ぶ"></select>
+<input id="ename" placeholder="チーム名入力" aria-label="チーム名入力" style="margin-top:8px" hidden>
 <div id="eplayers" style="margin-top:6px"></div>
-<input id="ename" placeholder="チーム名（例：A剣道会 Aチーム。空欄なら所属名）" aria-label="チーム名" style="margin-top:8px">
-<button class="pri" id="ecreate" style="width:100%;margin-top:8px">チームを作成</button>
+<button class="pri" id="ecreate" style="width:100%;margin-top:8px">チーム編成</button>
 <div id="emsg" class="sub" style="margin-top:8px" aria-live="polite"></div></div>
-<div class="hist" style="margin:8px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h2 style="margin:0">作成した大会チーム</h2><button class="sm rf" id="eclear" style="margin:0">すべて削除</button></div><div id="elist"></div></div></div>
+<div class="hist" style="margin:8px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h2 style="margin:0">作成したチーム編成</h2><button class="sm rf" id="eclear" style="margin:0">すべて削除</button></div><div id="elist"></div></div></div>
 <div id="viewt" hidden>
-<button class="pri" id="addteam" style="width:100%">＋ チームを作成</button>
+<button class="pri" id="addteam" style="width:100%">名簿作成</button>
 <div id="tmsg" class="sub" style="margin:6px 0" aria-live="polite"></div>
 <div id="tlist"></div>
 <div class="hist" style="margin:8px 0"><h2>名簿の共有（コピー＆貼り付け）</h2><div class="sub">1台で作った名簿を、LINEなどで他のスマホに送れます。</div>
@@ -178,8 +183,8 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const RA=s=>s==='r'?RR:RW,teamOf=s=>EVT.find(t=>t.id===TID[s]);
 const saveTeams=()=>{try{localStorage.setItem('kendoTeams',JSON.stringify(teams))}catch(e){}};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-let ENTRY={},INFO={a:'',b:''};
-try{ENTRY=JSON.parse(localStorage.getItem('kendoEntry')||'{}');INFO=JSON.parse(localStorage.getItem('kendoInfo')||'{"a":"","b":""}')}catch(e){}
+let ENTRY={},INFO={a:'',b:'',c:'',d:''};
+try{ENTRY=JSON.parse(localStorage.getItem('kendoEntry')||'{}');INFO=Object.assign({a:'',b:'',c:'',d:''},JSON.parse(localStorage.getItem('kendoInfo')||'{}'))}catch(e){}
 let EVT=[],SIDE={my:'',color:'r',opp:''},OPEN={},NMAP={};
 const tk=(id,s)=>id||'_'+s;
 try{EVT=JSON.parse(localStorage.getItem('kendoEvTeams')||'[]');SIDE=Object.assign(SIDE,JSON.parse(localStorage.getItem('kendoSide')||'{}'))}catch(e){}
@@ -196,7 +201,7 @@ const saveInfo=()=>{try{localStorage.setItem('kendoInfo',JSON.stringify(INFO))}c
 teams.forEach(t=>{t.players=(t.players||[]).map(p=>typeof p==='string'?{id:uid(),name:p,age:'',sex:'',grade:'',rank:''}:p)});
 const pl=T=>T?T.players.map(p=>p.name).filter(Boolean):[];
 const dataOf=(tid,name)=>{const T=EVT.find(t=>t.id===tid),p=T&&T.players.find(p=>p.name===name);return p?{age:p.age,sex:p.sex,grade:p.grade,rank:p.rank}:null};
-const infoStr=d=>d?[INFO.a,INFO.b].filter(Boolean).map(k=>k==='age'?(d.age?d.age+'歳':''):(d[k]||'')).filter(Boolean).join(' '):'';
+const infoStr=d=>d?[INFO.a,INFO.b,INFO.c,INFO.d].filter(Boolean).map(k=>k==='age'?(d.age?d.age+'歳':''):(d[k]||'')).filter(Boolean).join(' '):'';
 const fi=d=>{const t=infoStr(d);return t?`（${esc(t)}）`:''};
 const jkTxt=b=>b.jk&&b.sr===b.sw?'　じゃんけん '+(b.jk==='r'?'赤○ 白✕':'赤✕ 白○'):'';
 const nI=s=>{const t=infoStr(dataOf(TID[s],nm(s)));return t?`<br><small class="sub">${esc(t)}</small>`:''};
@@ -331,7 +336,7 @@ function buildRoster(){
   refreshPickers();buildRows();
 }
 let TAB='m';
-function showView(){const m=$('mode').value;$('viewt').hidden=TAB!=='t';$('viewe').hidden=TAB!=='e';$('viewm').hidden=TAB!=='m'||m==='i';$('viewi').hidden=TAB!=='m'||m!=='i';$('infobar').hidden=TAB!=='m';$('mode').hidden=TAB!=='m';$('evn').hidden=TAB!=='m';if(TAB!=='m')$('allpanel').hidden=true;$('sidebar').hidden=TAB!=='m';['m','e','t'].forEach(k=>$('tab'+k).classList.toggle('on',TAB===k))}
+function showView(){const m=$('mode').value;$('viewt').hidden=TAB!=='t';$('viewe').hidden=TAB!=='e';$('viewm').hidden=TAB!=='m'||m==='i';$('viewi').hidden=TAB!=='m'||m!=='i';$('infobar').hidden=TAB!=='m';$('resetall').hidden=TAB!=='m';$('mode').hidden=TAB!=='m';$('evn').hidden=TAB!=='m';if(TAB!=='m')$('allpanel').hidden=true;$('sidebar').hidden=TAB!=='m';['m','e','t'].forEach(k=>$('tab'+k).classList.toggle('on',TAB===k))}
 function initRoster(){
   ['r','w'].forEach(s=>{
     $('rost'+s).addEventListener('input',e=>{const t=e.target;if(t.tagName==='INPUT'){RA(s)[+t.dataset.i]=t.value.trim();persist();render()}});
@@ -351,7 +356,7 @@ function initRoster(){
     ev=[];cur=null;JK='';RR=[];RW=[];NMAP={};
     ['tr','tw'].forEach(i=>{$(i).value=''});
     SIDE={my:'',color:'r',opp:''};
-    INFO={a:'',b:''};saveInfo();$('inf1').value='';$('inf2').value='';
+    INFO={a:'',b:'',c:'',d:''};saveInfo();[1,2,3,4].forEach(i=>{$('inf'+i).value=''});
     $('sh').value='00';$('sm').value='00';$('dur').value='180';
     const isInd=$('mode').value==='i';
     if(all){$('evn').value='';try{localStorage.setItem('kendoEvn','')}catch(e){}}
@@ -379,8 +384,8 @@ function initRoster(){
   $('myteam').onchange=$('mycolor').onchange=$('oppteam').onchange=()=>{SIDE={my:$('myteam').value,color:$('mycolor').value,opp:$('oppteam').value};applySide()};
   $('tabe').onclick=()=>{TAB='e';showView();renderEntry()};
   $('tabt').onclick=()=>{TAB='t';showView();renderTeams()};
-  $('inf1').value=INFO.a||'';$('inf2').value=INFO.b||'';
-  $('inf1').onchange=$('inf2').onchange=()=>{INFO={a:$('inf1').value,b:$('inf2').value};saveInfo();render();if(window.renderInd)window.renderInd()};
+  ['a','b','c','d'].forEach((k,i)=>{$('inf'+(i+1)).value=INFO[k]||''});
+  [1,2,3,4].forEach(i=>{$('inf'+i).onchange=()=>{INFO={a:$('inf1').value,b:$('inf2').value,c:$('inf3').value,d:$('inf4').value};saveInfo();render();if(window.renderInd)window.renderInd()}});
   let armedImp=false;
   $('cpy').onclick=async()=>{
     const txt=teams.map(t=>'#'+t.name+'\n'+t.players.map(p=>[p.name,p.age,p.sex,p.grade,p.rank].join('|').replace(/\|+$/,'')).join('\n')).join('\n');
@@ -417,7 +422,9 @@ function initRoster(){
       p[f]=f==='age'?t.value.replace(/\D/g,'').slice(0,3):t.value.trim();
       if(f==='grade'&&GAGE[p.grade]!==undefined){p.age=String(GAGE[p.grade]);const ai=document.querySelector('#tlist input[data-f="age"][data-i="'+i+'"][data-j="'+j+'"]');if(ai)ai.value=p.age}
     }
-    saveTeams();$('tmsg').textContent='✓ 自動保存しました（'+hhmm()+'）';
+    saveTeams();
+    const ti=t.dataset.n!==undefined?+t.dataset.n:+t.dataset.i,det=t.closest('details');if(det&&teams[ti]){const q=teamStats(teams[ti]);det.querySelector('[data-st]').innerHTML=q.a;det.querySelector('[data-gr]').innerHTML=q.b}
+    $('tmsg').textContent='✓ 自動保存しました（'+hhmm()+'）';
   });
   $('tlist').addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.tid)OPEN[d.dataset.tid]=d.open},true);
   $('tlist').addEventListener('click',e=>{
@@ -443,7 +450,7 @@ function initRoster(){
     if(!ps.length){$('emsg').textContent='選手を1人以上選んでください。';return}
     const n0=$('ename').value.trim()||T.name||'チーム';
     EVT.push({id:uid(),mid:T.id,name:n0,players:ps});saveEvt();ESEL={};$('ename').value='';
-    renderEntry();$('emsg').textContent='✓ 「'+n0+'」を作成しました（'+ps.length+'人）。試合入力で選べます。';
+    renderEntry();$('emsg').textContent='✓ 「'+n0+'」を編成しました（'+ps.length+'人）。試合入力で選べます。';
   };
   $('elist').addEventListener('click',e=>{
     const b=e.target.closest('button');if(!b||b.dataset.de===undefined)return;
@@ -456,9 +463,9 @@ function initRoster(){
   };
 }
 let EM='',ESEL={};
-const OPT=(arr,v)=>'<option value=""></option>'+arr.map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
+const OPT=(arr,v,lab)=>`<option value="">${lab||''}</option>`+arr.map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
 const GR=['年少','年中','年長','小1','小2','小3','小4','小5','小6','中1','中2','中3'];
-const GAGE={'年少':3,'年中':4,'年長':5,'小1':6,'小2':7,'小3':8,'小4':9,'小5':10,'小6':11,'中1':12,'中2':13,'中3':14};
+const GAGE={'年少':4,'年中':5,'年長':6,'小1':7,'小2':8,'小3':9,'小4':10,'小5':11,'小6':12,'中1':13,'中2':14,'中3':15};
 const RK=['無級','10級','9級','8級','7級','6級','5級','4級','3級','2級','1級','初段','二段','三段','四段','五段','六段','七段','八段'];
 function refreshSide(){
   const o=t=>`<option value="${t.id}">${esc(t.name||'（名称未設定）')}</option>`,ex=id=>EVT.some(t=>t.id===id);
@@ -478,10 +485,20 @@ function applySide(){
   if(window.refreshInd)window.refreshInd();
   ['r','w'].forEach(s=>{const el=$('itsel'+s),v=TID[s]||'';if(el&&el.value!==v){el.value=v;el.dispatchEvent(new Event('change'))}});
   const nmOf=s=>teamOf(s)?teamOf(s).name:'未選択';
-  $('sidemsg').textContent=SIDE.my&&SIDE.my===SIDE.opp?'自分と相手に同じチームが選ばれています。':EVT.length?'赤：'+nmOf('r')+'　白：'+nmOf('w'):'「出場者」タブで大会チームを作ると、ここで選べます。';
+  $('sidemsg').textContent=SIDE.my&&SIDE.my===SIDE.opp?'自分と相手に同じチームが選ばれています。':EVT.length?'赤：'+nmOf('r')+'　白：'+nmOf('w'):'「出場者」タブでチームを編成すると、ここで選べます。';
 }
+const chip=(h,c)=>`<span class="cp${c?' '+c:''}">${h}</span>`;
+const teamStats=t=>{
+  const ps=t.players.filter(p=>p.name),m=ps.filter(p=>p.sex==='男').length,f=ps.filter(p=>p.sex==='女').length;
+  let h=chip(`<b>${ps.length}</b>人`,'ct');
+  if(m)h+=chip(`男 <b>${m}</b>`,'cm');
+  if(f)h+=chip(`女 <b>${f}</b>`,'cf');
+  let g='';
+  [...GR].reverse().forEach(k=>{const n=ps.filter(p=>p.grade===k).length;if(n)g+=chip(`${esc(k)} <b>${n}</b>人`,'cg')});
+  return {a:h,b:g};
+};
 function renderTeams(){
-  $('tlist').innerHTML=teams.map((t,i)=>`<details class="tm" data-tid="${t.id}"${OPEN[t.id]?' open':''}><summary><b>${esc(t.name||'（名称未設定）')}</b><span class="sub">${t.players.length}人</span></summary><input data-n="${i}" value="${esc(t.name)}" placeholder="チーム名（所属）" aria-label="チーム名" style="margin-top:8px">${t.players.map((p,j)=>{const k=`data-i="${i}" data-j="${j}"`;return `<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:8px"><div style="display:flex;gap:6px"><input data-f="name" ${k} value="${esc(p.name)}" placeholder="選手名" aria-label="選手名"><button class="sm" data-dp="${i}-${j}" style="margin:0;flex:none">削除</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"><input data-f="age" ${k} value="${esc(p.age||'')}" placeholder="年齢" inputmode="numeric" aria-label="年齢"><select data-f="sex" ${k} aria-label="男女">${OPT(['男','女'],p.sex)}</select><select data-f="grade" ${k} aria-label="学年">${OPT(GR,p.grade)}</select><select data-f="rank" ${k} aria-label="級位・段位">${OPT(RK,p.rank)}</select></div></div>`}).join('')}<button class="sm" data-ap="${i}" style="margin:10px 0 0">＋ 選手を追加</button><div class="sub" style="margin:10px 0 4px">名前をまとめて追加（1行に1人）</div><textarea data-bulk="${i}" rows="3" aria-label="名前をまとめて追加"></textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="sm" data-bb="${i}" style="margin:0">まとめて追加</button><button class="sm" data-x="${i}" style="margin:0 0 0 auto">このチームを削除</button></div><button class="pri" data-ok="${i}" style="margin-top:12px;width:100%">確定</button></details>`).join('')||'<div class="hist empty">まだ名簿がありません。上のボタンで作成してください。</div>';
+  $('tlist').innerHTML=teams.map((t,i)=>`<details class="tm" data-tid="${t.id}"${OPEN[t.id]?' open':''}><summary><div class="tsum">${(()=>{const q=teamStats(t);return `<div class="tname"><b>${esc(t.name||'（名称未設定）')}</b><span data-st="${i}">${q.a}</span></div><div data-gr="${i}">${q.b}</div>`})()}</div></summary><input data-n="${i}" value="${esc(t.name)}" placeholder="チーム名（所属）" aria-label="チーム名" style="margin-top:8px">${t.players.map((p,j)=>{const k=`data-i="${i}" data-j="${j}"`;return `<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:8px"><div style="display:flex;gap:6px"><input data-f="name" ${k} value="${esc(p.name)}" placeholder="選手名" aria-label="選手名"><button class="sm" data-dp="${i}-${j}" style="margin:0;flex:none">削除</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"><select data-f="sex" ${k} aria-label="男女">${OPT(['男','女'],p.sex,'性別')}</select><select data-f="rank" ${k} aria-label="級位・段位">${OPT(RK,p.rank,'段位・級位')}</select><select data-f="grade" ${k} aria-label="学年">${OPT(GR,p.grade,'学年')}</select><input data-f="age" ${k} value="${esc(p.age||'')}" placeholder="年齢（誕生日後）" inputmode="numeric" aria-label="年齢"></div></div>`}).join('')}<button class="sm" data-ap="${i}" style="margin:10px 0 0">＋ 選手を追加</button><div class="sub" style="margin:10px 0 4px">名前をまとめて追加（1行に1人）</div><textarea data-bulk="${i}" rows="3" aria-label="名前をまとめて追加"></textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="sm" data-bb="${i}" style="margin:0">まとめて追加</button><button class="sm" data-x="${i}" style="margin:0 0 0 auto">このチームを削除</button></div><button class="pri" data-ok="${i}" style="margin-top:12px;width:100%">確定</button></details>`).join('')||'<div class="hist empty">まだ名簿がありません。上のボタンで作成してください。</div>';
   $('addteam').disabled=teams.length>=5;
 }
 const usedBadge=(T,p)=>{const u=EVT.filter(e=>e.players.some(q=>q.id===p.id||(e.mid===T.id&&q.name===p.name))).map(e=>e.name);return u.length?`<span class="ub">${esc(u.join('、'))}</span>`:''};
@@ -489,8 +506,9 @@ function renderEntry(){
   $('emaster').innerHTML='<option value="">所属（名簿のチーム）を選ぶ</option>'+teams.map(t=>`<option value="${t.id}">${esc(t.name||'（名称未設定）')}</option>`).join('');
   if(!teams.some(t=>t.id===EM))EM='';$('emaster').value=EM;
   const T=teams.find(t=>t.id===EM);
+  $('ename').hidden=!T;
   $('eplayers').innerHTML=T?`<div class="row" style="margin:0 0 4px"><button class="sm" data-all="1">全員選ぶ</button><button class="sm" data-none="1">全員解除</button></div>`+(T.players.map(p=>`<label style="display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)"><input type="checkbox" style="width:auto;min-height:0" data-pid="${p.id}"${ESEL[p.id]?' checked':''}><span>${esc(p.name||'（名前なし）')}</span><span class="sub">${esc(pAttr(p))}</span>${usedBadge(T,p)}</label>`).join('')||'<span class="empty">この所属には選手が登録されていません</span>'):'';
-  $('elist').innerHTML=EVT.map((t,i)=>`<div style="background:var(--yel);border:2px solid var(--yelb);border-radius:10px;padding:10px 14px;margin:8px 0"><b>${esc(t.name)}</b> <span class="sub">${t.players.length}人</span><div class="sub">${esc(t.players.map(p=>p.name).join('、'))}</div><button class="sm" data-de="${i}" style="margin:6px 0 0">削除</button></div>`).join('')||'<span class="empty">まだ大会チームがありません</span>';
+  $('elist').innerHTML=EVT.map((t,i)=>`<div style="background:var(--yel);border:2px solid var(--yelb);border-radius:10px;padding:10px 14px;margin:8px 0"><b>${esc(t.name)}</b> <span class="sub">${t.players.length}人</span><div class="sub">${esc(t.players.map(p=>p.name).join('、'))}</div><button class="sm" data-de="${i}" style="margin:6px 0 0">削除</button></div>`).join('')||'<span class="empty">まだチームがありません</span>';
 }
 function resetT(){}
 let armed=false;
