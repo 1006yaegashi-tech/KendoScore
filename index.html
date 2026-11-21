@@ -69,6 +69,7 @@ textarea{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border
 .tm summary::-webkit-details-marker{display:none}.tm summary::after{content:'▾';margin-left:auto;font-size:1.2rem}.tm[open] summary::after{content:'▴'}
 .cp{display:inline-block;border:2px solid var(--ink);border-radius:8px;padding:1px 9px;margin:6px 6px 0 0;background:var(--surf);color:var(--ink);font-size:.85rem;font-weight:400}
 .cp b{font-size:1.15rem;font-weight:800}.cp.cm{border-color:#2f7fd0}.cp.cf{border-color:#d0488f}
+.gm{border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:6px 0;background:var(--surf)}
 #msg{font-size:.9rem;margin-top:8px;min-height:1.4em}
 .rg{display:grid;grid-template-columns:3.6em 1fr;gap:6px;align-items:center;margin-bottom:6px}
 .rg span{font-weight:700;font-size:.9rem}.rh span{color:var(--mute)}
@@ -101,6 +102,7 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 </div></div>
 
 <div class="cur-title" id="curt"></div>
+<div class="sub" id="nextmsg" hidden style="text-align:center;margin-top:2px">次の対戦は「チームリセット」を押して、チームを選び直してください。記録は残ります。</div>
 <div class="timer"><label>試合時間　<select id="dur" aria-label="試合時間"><option value="120">2分</option><option value="180" selected>3分</option><option value="240">4分</option><option value="300">5分</option></select></label>　<label>開始時刻　<select id="sh" aria-label="開始の時"></select>時 <select id="sm" aria-label="開始の分"></select>分</label></div>
 <div class="sides">
 <section class="side r"><div class="tag">赤</div><div class="pname" id="nr"></div>
@@ -122,7 +124,7 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 </div>
 <div class="verdict" id="verdict" aria-live="polite"></div>
 
-<div class="hist"><h2>記録した試合</h2><ul id="hist"></ul>
+<div class="hist"><h2>記録した試合</h2><ul id="hist"></ul><div id="games"></div>
 <div style="margin-top:12px">
 <button class="pri" id="pdf" style="width:100%">PDFに保存</button>
 <button id="clr" style="width:100%;margin-top:8px">一覧を削除</button>
@@ -185,7 +187,7 @@ const saveTeams=()=>{try{localStorage.setItem('kendoTeams',JSON.stringify(teams)
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 let ENTRY={},INFO={a:'',b:'',c:'',d:''};
 try{ENTRY=JSON.parse(localStorage.getItem('kendoEntry')||'{}');INFO=Object.assign({a:'',b:'',c:'',d:''},JSON.parse(localStorage.getItem('kendoInfo')||'{}'))}catch(e){}
-let EVT=[],SIDE={my:'',color:'r',opp:''},OPEN={},NMAP={};
+let EVT=[],SIDE={my:'',color:'r',opp:''},OPEN={},NMAP={},GAMES=[];
 const tk=(id,s)=>id||'_'+s;
 try{EVT=JSON.parse(localStorage.getItem('kendoEvTeams')||'[]');SIDE=Object.assign(SIDE,JSON.parse(localStorage.getItem('kendoSide')||'{}'))}catch(e){}
 const saveEvt=()=>{try{localStorage.setItem('kendoEvTeams',JSON.stringify(EVT))}catch(e){}};
@@ -207,13 +209,13 @@ const jkTxt=b=>b.jk&&b.sr===b.sw?'　じゃんけん '+(b.jk==='r'?'赤○ 白�
 const nI=s=>{const t=infoStr(dataOf(TID[s],nm(s)));return t?`<br><small class="sub">${esc(t)}</small>`:''};
 const pAttr=p=>[p.age?p.age+'歳':'',p.sex,p.grade,p.rank].filter(Boolean).join(' ');
 function load(){
-  bouts=[];RR=[];RW=[];NMAP={};TID={r:'',w:''};['tr','tw'].forEach(i=>$(i).value='');
-  try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');bouts=s.bouts||[];RR=s.rr||[];RW=s.rw||[];$('tr').value=s.tr||'';$('tw').value=s.tw||''}catch(e){}
+  bouts=[];RR=[];RW=[];NMAP={};GAMES=[];TID={r:'',w:''};['tr','tw'].forEach(i=>$(i).value='');
+  try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');bouts=s.bouts||[];GAMES=s.games||[];RR=s.rr||[];RW=s.rw||[];$('tr').value=s.tr||'';$('tw').value=s.tw||''}catch(e){}
   const oc=SIDE.color==='r'?'w':'r';TID={r:'',w:''};TID[SIDE.color]=SIDE.my;TID[oc]=SIDE.opp;
 }
 load();$('mode').value=MODE;
 try{$('evn').value=localStorage.getItem('kendoEvn')||''}catch(e){}
-const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify({bouts,rr:RR,rw:RW,tid:TID,tr:$('tr').value,tw:$('tw').value,evn:$('evn').value}))}catch(e){}};
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify({bouts,games:GAMES,rr:RR,rw:RW,tid:TID,tr:$('tr').value,tw:$('tw').value,evn:$('evn').value}))}catch(e){}};
 ['tr','tw'].forEach(i=>$(i).addEventListener('input',persist));
 $('evn').addEventListener('input',()=>{try{localStorage.setItem('kendoEvn',$('evn').value)}catch(e){}});
 const tn=s=>$('t'+s).value.trim()||(s==='r'?'赤チーム':'白チーム');
@@ -227,20 +229,22 @@ function calc(){
   });
   return o;
 }
-function tally(){
+function tally(bs){
+  bs=bs||bouts;
   const a={r:{w:0,p:0},w:{w:0,p:0}};
-  POS.forEach((_,i)=>{const b=bouts[i];if(!b)return;a.r.p+=b.sr;a.w.p+=b.sw;if(b.sr>b.sw)a.r.w++;else if(b.sw>b.sr)a.w.w++});
+  POS.forEach((_,i)=>{const b=bs[i];if(!b)return;a.r.p+=b.sr;a.w.p+=b.sw;if(b.sr>b.sw)a.r.w++;else if(b.sw>b.sr)a.w.w++});
   return a;
 }
-const wn=s=>tn(s)+'（'+(s==='r'?'赤':'白')+'）';
-const vw=(s,why)=>({text:wn(s)+' の勝ち（'+why+'）',done:true,win:s});
-function verdict(){
-  const t=tally();
-  if(!POS.every((_,i)=>bouts[i]))return {text:'',done:false,tie:false};
-  if(t.r.w!==t.w.w)return vw(t.r.w>t.w.w?'r':'w','勝者数');
-  if(t.r.p!==t.w.p)return vw(t.r.p>t.w.p?'r':'w','本数');
-  const b=bouts[POS.length];
-  if(b)return b.sr===b.sw?(b.jk?vw(b.jk,'じゃんけん'):{text:'引き分け（代表戦も同点）',done:true}):vw(b.sr>b.sw?'r':'w','代表戦');
+const wn=(s,nf)=>(nf||tn)(s)+'（'+(s==='r'?'赤':'白')+'）';
+const vw=(s,why,nf)=>({text:wn(s,nf)+' の勝ち（'+why+'）',done:true,win:s});
+function verdict(bs,nf){
+  bs=bs||bouts;
+  const t=tally(bs);
+  if(!POS.every((_,i)=>bs[i]))return {text:'',done:false,tie:false};
+  if(t.r.w!==t.w.w)return vw(t.r.w>t.w.w?'r':'w','勝者数',nf);
+  if(t.r.p!==t.w.p)return vw(t.r.p>t.w.p?'r':'w','本数',nf);
+  const b=bs[POS.length];
+  if(b)return b.sr===b.sw?(b.jk?vw(b.jk,'じゃんけん',nf):{text:'引き分け（代表戦も同点）',done:true}):vw(b.sr>b.sw?'r':'w','代表戦',nf);
   return {text:'勝者数・本数が同じです。代表戦を行います',done:false,tie:true};
 }
 function posName(i){return i<POS.length?POS[i]:'代表戦'}
@@ -274,12 +278,13 @@ function render(){
     return `<button class="chip${b?' done':''}${i===idx?' cur':''}" data-c="${i}">${p}${b?' '+sp(b.sr,b.sw):''}</button>`}).join('');
   $('verdict').textContent=v.text;
   $('curt').textContent=idx<0?'全試合終了':(idx<POS.length?POS[idx]+'戦':'代表戦')+(bouts[idx]?'（修正中）':'');
-  $('save').disabled=idx<0;
+  $('save').disabled=idx<0;$('nextmsg').hidden=idx>=0;
   document.querySelectorAll('.jk').forEach(el=>{el.hidden=!(idx>=POS.length);el.value=JK===el.dataset.jk?'o':(JK?'x':'')});
   $('save').textContent=bouts[idx]?'修正を保存':'この試合を記録して次へ';
   $('cancel').hidden=cur===null;
   const rows=POS.concat('代表戦').map((p,i)=>bouts[i]?`<li>${p}　${bouts[i].r}${fi(bouts[i].dr)} ${sh(bouts[i].sr,bouts[i].sw)} ${bouts[i].w}${fi(bouts[i].dw)}${jkTxt(bouts[i])}　<button class="sm" data-e="${i}">修正</button><button class="sm" data-d="${i}">削除</button></li>`:'').join('');
   $('hist').innerHTML=rows||'<span class="empty">記録するとここに並びます</span>';
+  $('games').innerHTML=GAMES.length?'<div class="sub" style="margin:12px 0 4px">終了した対戦</div>'+GAMES.map((g,i)=>{const nf=s=>s==='r'?g.tr:g.tw,t=tally(g.bouts),v=verdict(g.bouts,nf);return `<div class="gm"><b>${i+1}.</b> ${esc(g.tr)}（赤） ${t.r.w}勝${t.r.p}本 － ${t.w.w}勝${t.w.p}本 ${esc(g.tw)}（白）<br><span class="sub">${esc(v.text||'途中まで')}</span> <button class="sm" data-dg="${i}" style="margin:0 0 0 6px">削除</button></div>`}).join(''):'';
 }
 document.querySelectorAll('.waza').forEach(g=>g.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
@@ -353,6 +358,7 @@ function initRoster(){
   document.querySelectorAll('.jk').forEach(el=>el.addEventListener('change',()=>{const s=el.dataset.jk;JK=el.value==='o'?s:el.value==='x'?(s==='r'?'w':'r'):'';render()}));
   let armedR=false;
   function doReset(all,del){
+    if($('mode').value!=='i'){if(del){GAMES=[];bouts=[]}else if(bouts.some(Boolean)){GAMES.push({tr:tn('r'),tw:tn('w'),bouts:bouts.slice()});bouts=[]}}
     ev=[];cur=null;JK='';RR=[];RW=[];NMAP={};
     ['tr','tw'].forEach(i=>{$(i).value=''});
     SIDE={my:'',color:'r',opp:''};
@@ -439,6 +445,9 @@ function initRoster(){
       saveTeams();renderTeams();$('tmsg').textContent='✓ 削除して保存しました（'+hhmm()+'）';
     }
   });
+  $('games').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.dg===undefined)return;
+    if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='本当に削除';setTimeout(()=>{b.dataset.armed='';b.textContent='削除'},3000);return}
+    GAMES.splice(+b.dataset.dg,1);persist();render()});
   let armedE=false;
   $('emaster').onchange=()=>{EM=$('emaster').value;ESEL={};renderEntry()};
   $('eplayers').addEventListener('change',e=>{const t=e.target;if(t.dataset.pid){if(t.checked)ESEL[t.dataset.pid]=true;else delete ESEL[t.dataset.pid]}});
@@ -515,19 +524,23 @@ let armed=false;
 $('clr').onclick=()=>{
   if(!armed){armed=true;$('clr').textContent='もう一度押すと、記録した試合の一覧を削除します';setTimeout(()=>{armed=false;$('clr').textContent='一覧を削除'},4000);return}
   armed=false;$('clr').textContent='一覧を削除';
-  bouts=[];cur=null;JK='';persist();render();
+  bouts=[];GAMES=[];cur=null;JK='';persist();render();
 };
 
 async function mkPdf(){
   try{await document.fonts.load('bold 34px "Noto Sans JP"')}catch(e){}
   const W=1240,H=1754,F='"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif';
+  const games=GAMES.concat(bouts.some(Boolean)?[{tr:tn('r'),tw:tn('w'),bouts:bouts}]:[]);
+  const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+  games.forEach((g,gi)=>{
+  const bs=g.bouts,nf=s=>s==='r'?g.tr:g.tw;
   const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const t=tally(),v=verdict();
+  const t=tally(bs),v=verdict(bs,nf);
   x.fillStyle='#fff';x.fillRect(0,0,W,H);
   x.fillStyle='#14213a';x.font='bold 52px '+F;x.textAlign='center';x.fillText($('evn').value.trim()||'団体戦',W/2,120,W-160);
   x.fillStyle='#14213a';x.font='28px '+F;x.textAlign='center';x.fillText(new Date().toLocaleDateString('ja-JP')+'　'+POS.length+'人制　'+$('dur').selectedOptions[0].text+'試合　'+$('sh').value+':'+$('sm').value+'開始',W/2,205,W-160);x.textAlign='left';
-  x.font='bold 40px '+F;x.textAlign='center';x.fillStyle='#c4372f';x.fillText(tn('r'),350,300,420);
-  x.fillStyle='#14213a';x.fillText(tn('w'),940,300,420);
+  x.font='bold 40px '+F;x.textAlign='center';x.fillStyle='#c4372f';x.fillText(g.tr,350,300,420);
+  x.fillStyle='#14213a';x.fillText(g.tw,940,300,420);
   x.textAlign='left';
   const techs=(px,py,list,right,col,win,cf)=>{
     const gap=64,n=list.length,x0=right?px-n*gap+gap/2:px+gap/2;
@@ -551,8 +564,8 @@ async function mkPdf(){
     x.restore();
   };
   const hs=(px,n)=>px+(n?n*64+58:24);
-  const pitch=Math.min(225,Math.floor((1700-90-100-350)/Math.max(bouts.filter(Boolean).length,1)));
-  bouts.filter(Boolean).forEach((m,i)=>{
+  const pitch=Math.min(225,Math.floor((1700-90-100-350)/Math.max(bs.filter(Boolean).length,1)));
+  bs.filter(Boolean).forEach((m,i)=>{
     const y=350+i*pitch;
     x.strokeStyle='#c9d1de';x.lineWidth=2;x.beginPath();x.moveTo(80,y+184);x.lineTo(W-80,y+184);x.stroke();
     x.fillStyle='#5d6a82';x.font='bold 28px '+F;x.textAlign='left';x.fillText(m.p,80,y+96);
@@ -569,7 +582,7 @@ async function mkPdf(){
     if(m.jk&&m.sr===m.sw){x.font='24px '+F;x.fillStyle='#14213a';x.fillText('じゃんけん　'+(m.jk==='r'?'○　－　✕':'✕　－　○'),620,y+136)}
     x.textAlign='left';
   });
-  const nrow=bouts.filter(Boolean).length,ty=350+nrow*pitch+100;
+  const nrow=bs.filter(Boolean).length,ty=350+nrow*pitch+100;
   const txt=t.r.w+'勝　'+t.r.p+'本　　－　　'+t.w.w+'勝　'+t.w.p+'本';
   x.fillStyle='#14213a';x.textAlign='center';x.font='bold 54px '+F;x.fillText(txt,W/2,ty,W-160);
   const tw=Math.min(x.measureText(txt).width,W-160);
@@ -579,13 +592,14 @@ async function mkPdf(){
   if(v.win==='w'){x.lineJoin='round';x.lineWidth=4;x.strokeStyle='#14213a';x.strokeText(v.text,W/2,ty+90,W-160);x.fillStyle='#fff'}else if(v.win==='r')x.fillStyle='#c4372f';
   x.fillText(v.text,W/2,ty+90,W-160);
   x.textAlign='left';
-  const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+  if(gi>0)pdf.addPage();
   pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,210,297);
+  });
   return pdf.output('blob');
 }
 $('pdf').onclick=async()=>{
   const msg=$('msg');
-  if(!bouts.some(Boolean)){msg.textContent='先に「この試合を記録して次へ」で試合を記録してください。';return}
+  if(!bouts.some(Boolean)&&!GAMES.length){msg.textContent='先に「この試合を記録して次へ」で試合を記録してください。';return}
   msg.textContent='PDFを作成中…';
   try{
     const blob=await mkPdf();
