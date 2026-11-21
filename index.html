@@ -162,7 +162,10 @@ select{font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;b
 <div id="eplayers" style="margin-top:6px"></div>
 <button class="pri" id="ecreate" style="width:100%;margin-top:8px">チーム編成</button>
 <div id="emsg" class="sub" style="margin-top:8px" aria-live="polite"></div></div>
-<div class="hist" style="margin:8px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h2 style="margin:0">作成したチーム編成</h2><button class="sm rf" id="eclear" style="margin:0">すべて削除</button></div><div id="elist"></div></div></div>
+<div class="hist" style="margin:8px 0"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><h2 style="margin:0">作成したチーム編成</h2><button class="sm rf" id="eclear" style="margin:0">すべて削除</button></div><div id="elist"></div></div>
+<div class="hist" style="margin:8px 0"><h2>チーム編成の共有（コピー＆貼り付け）</h2><div class="sub">作ったチーム編成を、LINEなどで他のスマホに送れます。読み込むと、そのスマホにあるチーム編成は、すべて消えて、貼り付けた内容に置き換わります。</div>
+<textarea id="ecode" rows="4" placeholder="ここにチーム編成のコードを貼り付け" aria-label="チーム編成のコード" style="margin:8px 0"></textarea>
+<div class="row" style="margin-top:0"><button id="ecpy">チーム編成をコピー</button><button class="pri" id="eimp">貼り付けた編成を読み込む</button><button id="eclrcode">クリア</button></div><div id="ecmsg" class="sub" style="margin-top:8px" aria-live="polite"></div></div></div>
 <div id="viewt" hidden>
 <button class="pri" id="addteam" style="width:100%">名簿作成</button>
 <div id="tmsg" class="sub" style="margin:6px 0" aria-live="polite"></div>
@@ -448,6 +451,27 @@ function initRoster(){
   $('games').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.dg===undefined)return;
     if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='本当に削除';setTimeout(()=>{b.dataset.armed='';b.textContent='削除'},3000);return}
     GAMES.splice(+b.dataset.dg,1);persist();render()});
+  let armedEI=false;
+  $('ecpy').onclick=async()=>{
+    if(!EVT.length){$('ecmsg').textContent='コピーするチーム編成がありません。';return}
+    const txt=EVT.map(t=>{const mn=t.mname||((teams.find(m=>m.id===t.mid)||{}).name)||'';return '#'+t.name+(mn?'|'+mn:'')+'\n'+t.players.map(p=>[p.name,p.age,p.sex,p.grade,p.rank].join('|').replace(/\|+$/,'')).join('\n')}).join('\n');
+    $('ecode').value=txt;$('ecode').select();
+    let ok=false;try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{ok=document.execCommand('copy')}catch(e2){}}
+    if(ok)$('ecode').value='';
+    $('ecmsg').textContent=ok?'コピーしました。LINEなどに貼り付けて送れます。':'上の文字を長押しして、すべて選択してコピーしてください。';
+  };
+  $('eimp').onclick=()=>{
+    const raw=$('ecode').value.trim(),nt=[];let c=null;
+    raw.split(/\r?\n/).forEach(ln=>{const l=ln.trim();if(!l)return;
+      if(l[0]==='#'){const pr=l.slice(1).split('|');c={id:uid(),mid:'',mname:(pr[1]||'').trim(),name:(pr[0]||'').trim(),players:[]};nt.push(c)}
+      else if(c){const f=l.split('|').map(x=>x.trim());if(f[0])c.players.push({id:uid(),name:f[0],age:f[1]||'',sex:f[2]||'',grade:f[3]||'',rank:f[4]||''})}});
+    if(!nt.length){$('ecmsg').textContent='読み込めませんでした。コードの全体をコピーして貼り付けてください。';return}
+    if(EVT.length&&!armedEI){armedEI=true;$('ecmsg').textContent='いまのチーム編成（'+EVT.length+'チーム）は、すべて消えます。よければ、もう一度押してください。';setTimeout(()=>{armedEI=false},5000);return}
+    armedEI=false;EVT=nt;saveEvt();$('ecode').value='';
+    refreshSide();applySide();renderEntry();
+    $('ecmsg').textContent='✓ '+nt.length+'チームを読み込みました。';
+  };
+  $('eclrcode').onclick=()=>{$('ecode').value='';$('ecmsg').textContent=''};
   let armedE=false;
   $('emaster').onchange=()=>{EM=$('emaster').value;ESEL={};renderEntry()};
   $('eplayers').addEventListener('change',e=>{const t=e.target;if(t.dataset.pid){if(t.checked)ESEL[t.dataset.pid]=true;else delete ESEL[t.dataset.pid]}});
@@ -458,7 +482,7 @@ function initRoster(){
     const ps=T.players.filter(p=>ESEL[p.id]&&p.name).map(p=>Object.assign({},p));
     if(!ps.length){$('emsg').textContent='選手を1人以上選んでください。';return}
     const n0=$('ename').value.trim()||T.name||'チーム';
-    EVT.push({id:uid(),mid:T.id,name:n0,players:ps});saveEvt();ESEL={};$('ename').value='';
+    EVT.push({id:uid(),mid:T.id,mname:T.name,name:n0,players:ps});saveEvt();ESEL={};$('ename').value='';
     renderEntry();$('emsg').textContent='✓ 「'+n0+'」を編成しました（'+ps.length+'人）。試合入力で選べます。';
   };
   $('elist').addEventListener('click',e=>{
@@ -510,7 +534,7 @@ function renderTeams(){
   $('tlist').innerHTML=teams.map((t,i)=>`<details class="tm" data-tid="${t.id}"${OPEN[t.id]?' open':''}><summary><div class="tsum">${(()=>{const q=teamStats(t);return `<div class="tname"><b>${esc(t.name||'（名称未設定）')}</b><span data-st="${i}">${q.a}</span></div><div data-gr="${i}">${q.b}</div>`})()}</div></summary><input data-n="${i}" value="${esc(t.name)}" placeholder="チーム名（所属）" aria-label="チーム名" style="margin-top:8px">${t.players.map((p,j)=>{const k=`data-i="${i}" data-j="${j}"`;return `<div style="border-top:1px solid var(--line);margin-top:10px;padding-top:8px"><div style="display:flex;gap:6px"><input data-f="name" ${k} value="${esc(p.name)}" placeholder="選手名" aria-label="選手名"><button class="sm" data-dp="${i}-${j}" style="margin:0;flex:none">削除</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"><select data-f="sex" ${k} aria-label="男女">${OPT(['男','女'],p.sex,'性別')}</select><select data-f="rank" ${k} aria-label="級位・段位">${OPT(RK,p.rank,'段位・級位')}</select><select data-f="grade" ${k} aria-label="学年">${OPT(GR,p.grade,'学年')}</select><input data-f="age" ${k} value="${esc(p.age||'')}" placeholder="年齢（誕生日後）" inputmode="numeric" aria-label="年齢"></div></div>`}).join('')}<button class="sm" data-ap="${i}" style="margin:10px 0 0">＋ 選手を追加</button><div class="sub" style="margin:10px 0 4px">名前をまとめて追加（1行に1人）</div><textarea data-bulk="${i}" rows="3" aria-label="名前をまとめて追加"></textarea><div style="display:flex;gap:6px;margin-top:6px"><button class="sm" data-bb="${i}" style="margin:0">まとめて追加</button><button class="sm" data-x="${i}" style="margin:0 0 0 auto">このチームを削除</button></div><button class="pri" data-ok="${i}" style="margin-top:12px;width:100%">確定</button></details>`).join('')||'<div class="hist empty">まだ名簿がありません。上のボタンで作成してください。</div>';
   $('addteam').disabled=teams.length>=5;
 }
-const usedBadge=(T,p)=>{const u=EVT.filter(e=>e.players.some(q=>q.id===p.id||(e.mid===T.id&&q.name===p.name))).map(e=>e.name);return u.length?`<span class="ub">${esc(u.join('、'))}</span>`:''};
+const usedBadge=(T,p)=>{const u=EVT.filter(e=>e.players.some(q=>q.id===p.id||((e.mid===T.id||(e.mname&&e.mname===T.name))&&q.name===p.name))).map(e=>e.name);return u.length?`<span class="ub">${esc(u.join('、'))}</span>`:''};
 function renderEntry(){
   $('emaster').innerHTML='<option value="">所属（名簿のチーム）を選ぶ</option>'+teams.map(t=>`<option value="${t.id}">${esc(t.name||'（名称未設定）')}</option>`).join('');
   if(!teams.some(t=>t.id===EM))EM='';$('emaster').value=EM;
